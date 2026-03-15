@@ -11,7 +11,7 @@ function Feedback({ docId }) {
     setLoading(true);
     try {
       let res = await axios.put(
-        "http://localhost:8080/questions-api/feedback",
+        "https://skillcheck-ai-project-groq.onrender.com/questions-api/feedback",
         { id: docId },
         { withCredentials: true },
       );

@@ -20,7 +20,7 @@ function Register() {
   async function submitForm(data) {
     try {
       let res = await axios.post(
-        "http://localhost:8080/user-api/register",
+        "https://skillcheck-ai-project-groq.onrender.com/user-api/register",
         data,
       );
 

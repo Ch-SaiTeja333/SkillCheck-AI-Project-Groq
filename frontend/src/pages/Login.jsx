@@ -17,9 +17,13 @@ function Login() {
 
   async function submitForm(data) {
     try {
-      let res = await axios.post("http://localhost:8080/user-api/login", data, {
-        withCredentials: true,
-      });
+      let res = await axios.post(
+        "https://skillcheck-ai-project-groq.onrender.com/user-api/login",
+        data,
+        {
+          withCredentials: true,
+        },
+      );
 
       if (res.status === 200) {
         toast.success(res.data.message);

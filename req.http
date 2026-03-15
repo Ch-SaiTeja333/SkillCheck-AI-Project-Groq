@@ -1,5 +1,5 @@
 ###REGISTER
-POST http://localhost:8080/user-api/register
+POST https://skillcheck-ai-project-groq.onrender.com/user-api/register
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 
 
 ###LOGIN
-POST http://localhost:8080/user-api/login
+POST https://skillcheck-ai-project-groq.onrender.com/user-api/login
 Content-Type: application/json
 #INVALID EMAIL
 # {
@@ -32,7 +32,7 @@ Content-Type: application/json
 
 
 ###logout
-POST http://localhost:8080/user-api/logout
+POST https://skillcheck-ai-project-groq.onrender.com/user-api/logout
 Content-Type: application/json
 Cookie: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImVtYWlsIjoidGVzdDFAZ21haWwuY29tIiwicGFzc3dvcmQiOiJ0ZXN0MSJ9LCJpYXQiOjE3Njk0NDU3MTEsImV4cCI6MTc2OTUzMjExMX0.RUsGwj3Xuwee1a0DD6oV3BoGvwxmRCdy2GUzJt7pHIU
 {
@@ -43,5 +43,5 @@ Cookie: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImVtYWlsIjoidGVzdDF
 
 
 ###quiz
-POST http://localhost:8080//questions-api/generate
+POST https://skillcheck-ai-project-groq.onrender.com//questions-api/generate
 Content-Type: application/json 

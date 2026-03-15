@@ -23,7 +23,7 @@ function AttemptQuiz() {
   async function getQuestions() {
     try {
       let res = await axios.post(
-        `http://localhost:8080/questions-api/generate/${user.id}`,
+        `https://skillcheck-ai-project-groq.onrender.com/questions-api/generate/${user.id}`,
         data,
         { withCredentials: true },
       );
@@ -79,7 +79,7 @@ function AttemptQuiz() {
     try {
       // console.log(resdata);
       let res = await axios.put(
-        `http://localhost:8080/questions-api/score-answers`,
+        `https://skillcheck-ai-project-groq.onrender.com/questions-api/score-answers`,
         { score: score, userOptions: userAnswers, docId: docId },
         { withCredentials: true },
       );

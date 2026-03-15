@@ -22,7 +22,7 @@ function Profile() {
     // console.log('email:...',user.email);
     try {
       let res = await axios.post(
-        "http://localhost:8080/user-api/getUserName",
+        "https://skillcheck-ai-project-groq.onrender.com/user-api/getUserName",
         { email: user.email },
         { withCredentials: true },
       );
@@ -38,7 +38,7 @@ function Profile() {
     // console.log('current user..',user);
     try {
       let res = await axios.get(
-        `http://localhost:8080/questions-api/profile/${user?.id}`,
+        `https://skillcheck-ai-project-groq.onrender.com/questions-api/profile/${user?.id}`,
         { withCredentials: true },
       );
       // console.log("....",res.data.payload);

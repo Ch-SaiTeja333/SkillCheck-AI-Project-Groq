@@ -9,7 +9,7 @@ function Logout() {
   async function backendCall() {
     try {
       let res = await axios.post(
-        "http://localhost:8080/user-api/logout",
+        "https://skillcheck-ai-project-groq.onrender.com/user-api/logout",
         { data: "logout" },
         { withCredentials: true },
       );

@@ -12,7 +12,7 @@ function EntireQuizDetails() {
   async function getEntireQuizDetails() {
     try {
       let res = await axios.get(
-        `http://localhost:8080/history-api/user-history/${userId}/${historyId}`,
+        `https://skillcheck-ai-project-groq.onrender.com/history-api/user-history/${userId}/${historyId}`,
         { withCredentials: true },
       );
       // console.log("entire quiz details : ",res.data.payload);

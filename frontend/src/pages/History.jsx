@@ -14,7 +14,7 @@ function History() {
   async function getHistory() {
     try {
       let res = await axios.get(
-        `http://localhost:8080/history-api/user-history/${user.id}`,
+        `https://skillcheck-ai-project-groq.onrender.com/history-api/user-history/${user.id}`,
         { withCredentials: true },
       );
       // console.log(res.data.payload);
