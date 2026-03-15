@@ -24,7 +24,7 @@ app.use("/history-api", verifyToken, historyRoutes);
 
 //! connect to database
 mongoose
-  .connect("mongodb://localhost:27017/ai")
+  .connect("mongodb+srv://chintakrindasaiteja_db_user:n8y1AuHluMBLOBiA@cluster0.1n1pqtg.mongodb.net/?appName=Cluster0")
   .then(() => {
     console.log("Database connected successfully");
     app.listen(PORT, () => {
