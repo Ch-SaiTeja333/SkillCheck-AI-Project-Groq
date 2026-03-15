@@ -12,6 +12,11 @@ questionsRoutes.post("/generate/:id", async (req, res) => {
     let { topic, difficultyLevel, numberOfQuestions } = req.body;
     let prompt = buildPrompt(topic, difficultyLevel, numberOfQuestions);
     let aiResponse = await runApi(prompt);
+
+    if (!aiResponse) {
+      return res.status(500).json({ message: "Failed to generate questions" });
+    }
+
     // console.log(aiResponse);
     // remove ```json and ```
     const cleanResponse = aiResponse
@@ -21,6 +26,12 @@ questionsRoutes.post("/generate/:id", async (req, res) => {
     const parsed = JSON.parse(cleanResponse);
     // Save to database
     // console.log('Parsed AI Response:', parsed);
+
+    if (!parsed || !Array.isArray(parsed) || parsed.length === 0) {
+      return res
+        .status(500)
+        .json({ message: "Failed to parse generated questions" });
+    }
 
     const questionsData = {
       userId: id,
@@ -107,13 +118,14 @@ questionsRoutes.put("/feedback", async (req, res) => {
     // console.log("record", record)
     await record.save();
     const resultantFeedback = JSON.parse(clean);
-    res
-      .status(200)
-      .json({
-        message: "Feedback saved successfully",
-        payload: {...resultantFeedback,score: record.score, percentage: record.percentage},
-      });
-
+    res.status(200).json({
+      message: "Feedback saved successfully",
+      payload: {
+        ...resultantFeedback,
+        score: record.score,
+        percentage: record.percentage,
+      },
+    });
   } catch (err) {
     console.log(
       "err in saving feedback--questions-api Backend...",
@@ -148,15 +160,16 @@ questionsRoutes.get("/profile/:id", async (req, res) => {
     const { id } = req.params;
     // console.log('id...',id);
     const records = await questionsModel
-      .find({ userId: id ,  $expr: { $ne: ["$createdAt", "$updatedAt"] } }, { topic: 1, score: 1, percentage: 1, createdAt: 1,numberQuestions:1 })
+      .find(
+        { userId: id, $expr: { $ne: ["$createdAt", "$updatedAt"] } },
+        { topic: 1, score: 1, percentage: 1, createdAt: 1, numberQuestions: 1 },
+      )
       .sort({ createdAt: -1 });
     // console.log(records)
-    res
-      .status(200)
-      .json({
-        message: "Profile details fetched successfully",
-        payload: records,
-      });
+    res.status(200).json({
+      message: "Profile details fetched successfully",
+      payload: records,
+    });
   } catch (err) {
     console.log(
       "err in fetching profile details--questions-api Backend...",

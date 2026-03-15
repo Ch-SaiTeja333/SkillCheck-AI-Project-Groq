@@ -15,7 +15,12 @@ const PORT = 8080;
 
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(cors({ origin: "https://skillcheck-ai-project-groq-1.onrender.com", credentials: true }));
+app.use(
+  cors({
+    origin: "https://skillcheck-ai-project-groq-1.onrender.com",
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 
 app.use("/user-api", userRoutes);
@@ -24,7 +29,9 @@ app.use("/history-api", verifyToken, historyRoutes);
 
 //! connect to database
 mongoose
-  .connect("mongodb+srv://chintakrindasaiteja_db_user:n8y1AuHluMBLOBiA@cluster0.1n1pqtg.mongodb.net/?appName=Cluster0")
+  .connect(
+    "mongodb+srv://chintakrindasaiteja_db_user:n8y1AuHluMBLOBiA@cluster0.1n1pqtg.mongodb.net/skill-check-ai-groq-project",
+  )
   .then(() => {
     console.log("Database connected successfully");
     app.listen(PORT, () => {
