@@ -7,36 +7,69 @@ import { questionsModel } from "../models/questions-model.js";
 import mongoose from "mongoose";
 questionsRoutes.post("/generate/:id", async (req, res) => {
   try {
-    let { id } = req.params;
-    // console.log('id....',id);
-    let { topic, difficultyLevel, numberOfQuestions } = req.body;
-    let prompt = buildPrompt(topic, difficultyLevel, numberOfQuestions);
-    let aiResponse = await runApi(prompt);
+    const { id } = req.params;
+    const { topic, difficultyLevel, numberOfQuestions } = req.body;
+
+    /* =========================
+       BASIC VALIDATION
+    ========================= */
+
+    if (!topic || topic.trim().length < 3) {
+      return res.status(400).json({
+        message: "Please enter a valid topic",
+      });
+    }
+
+    /* =========================
+       AI TOPIC VALIDATION
+    ========================= */
+
+    const validTopic = await validateTopic(topic);
+
+    if (!validTopic) {
+      return res.status(400).json({
+        message:
+          "The entered topic is not recognized as a valid academic or professional subject.",
+      });
+    }
+
+    /* =========================
+       GENERATE QUESTIONS
+    ========================= */
+
+    const prompt = buildPrompt(topic, difficultyLevel, numberOfQuestions);
+
+    const aiResponse = await runApi(prompt);
 
     if (!aiResponse) {
       return res.status(500).json({ message: "Failed to generate questions" });
     }
 
-    // console.log(aiResponse);
-    // remove ```json and ```
+    /* =========================
+       CLEAN AI RESPONSE
+    ========================= */
+
     const cleanResponse = aiResponse
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
+
     const parsed = JSON.parse(cleanResponse);
-    // Save to database
-    // console.log('Parsed AI Response:', parsed);
 
     if (!parsed || !Array.isArray(parsed) || parsed.length === 0) {
-      return res
-        .status(500)
-        .json({ message: "Failed to parse generated questions" });
+      return res.status(500).json({
+        message: "Failed to parse generated questions",
+      });
     }
+
+    /* =========================
+       PREPARE DB DATA
+    ========================= */
 
     const questionsData = {
       userId: id,
-      topic: topic,
-      difficultyLevel: difficultyLevel,
+      topic,
+      difficultyLevel,
       numberQuestions: numberOfQuestions,
       questions: parsed.map((item) => item.question),
       options: {
@@ -48,22 +81,28 @@ questionsRoutes.post("/generate/:id", async (req, res) => {
       percentage: 0,
       feedback: "",
     };
-    // console.log('question data .... database',questionsData);
+
     const newQuestions = new questionsModel(questionsData);
 
-    // console.log("generated newQuestions", newQuestions);
     await newQuestions.save();
-    // console.log('Questions saved to database successfully');
+
+    /* =========================
+       RESPONSE
+    ========================= */
+
     res.status(200).json({
       message: "Questions generated successfully",
       payload: newQuestions,
     });
   } catch (err) {
     console.log(
-      "err in Generating questions--questions-api Backend...",
+      "Error generating questions (questions-api Backend):",
       err.message,
     );
-    res.status(500).json({ message: err.message });
+
+    res.status(500).json({
+      message: "Internal server error",
+    });
   }
 });
 

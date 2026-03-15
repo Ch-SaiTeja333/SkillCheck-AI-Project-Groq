@@ -1,9 +1,9 @@
 import axios from "axios";
 import "dotenv/config";
 
-/* ================================
+/* =================================
    GROQ API CALL
-================================ */
+================================= */
 
 export const runApi = async (promptText) => {
   try {
@@ -12,7 +12,7 @@ export const runApi = async (promptText) => {
       {
         model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: promptText }],
-        temperature: 0.2,
+        temperature: 0.5,
       },
       {
         headers: {
@@ -22,20 +22,75 @@ export const runApi = async (promptText) => {
       },
     );
 
-    const data = response.data;
-
-    return data.choices[0].message.content;
+    return response.data.choices[0].message.content;
   } catch (error) {
-    console.log("Groq Error:", error);
+    console.log("Groq Error:", error.message);
     return null;
   }
 };
-/* ================================
+
+/* =================================
+   BASIC TOPIC VALIDATION
+================================= */
+
+export const basicTopicValidation = (topic) => {
+  if (!topic) return false;
+  const clean = topic.trim();
+  if (clean.length < 3) return false;
+  if (!/[a-zA-Z]/.test(clean)) return false;
+  return true;
+};
+
+/* =================================
+   AI TOPIC VALIDATION
+================================= */
+
+export const validateTopic = async (topic) => {
+  const prompt = `
+Determine if the following text is a valid academic or professional topic.
+
+Topic: "${topic}"
+
+Valid examples:
+Math
+DBMS
+SQL
+React
+Machine Learning
+Cardiology
+Physics
+
+Invalid examples:
+abc
+xyz
+123
+asdfgh
+
+Return ONLY JSON:
+
+{
+ "valid": true or false
+}
+`;
+
+  const response = await runApi(prompt);
+
+  try {
+    const clean = response.replace(/```json|```/g, "");
+    const parsed = JSON.parse(clean);
+    return parsed.valid;
+  } catch {
+    return false;
+  }
+};
+
+/* =================================
    QUESTION GENERATION PROMPT
-================================ */
+================================= */
 
 export const buildPrompt = (topic, difficultyLevel, numberOfQuestions) => `
 Generate ${numberOfQuestions} multiple-choice questions (MCQs) on the topic "${topic}".
+
 Difficulty level: ${difficultyLevel}.
 
 Rules:
@@ -54,9 +109,9 @@ Format:
 ]
 `;
 
-/* ================================
+/* =================================
    FEEDBACK GENERATION PROMPT
-================================ */
+================================= */
 
 export const buildFeedbackPrompt = (obj) => `
 A user attempted a quiz.
@@ -67,38 +122,60 @@ Score: ${obj.score}
 Percentage: ${obj.percentage}%
 
 Questions and Answers:
+
 ${obj.questions
   .map(
     (q, i) => `
 Question ${i + 1}: ${q}
+
 Options: ${obj.options.availableOptions[i].join(", ")}
+
 Correct Answer: ${obj.options.correctOptions[i]}
+
 User Answer: ${obj.options.userOptions[i] || "Not Answered"}
 `,
   )
   .join("\n")}
 
 Instructions:
+
 - Analyze the user's performance carefully.
-- Explain the overall performance in **3-4 sentences**.
-- Mention what the user understood well.
-- Clearly explain weak areas.
-- Give **detailed improvement suggestions**.
-- Do NOT repeat the questions.
+- Explain the overall performance in 3-4 sentences.
+- Mention strengths.
+- Explain weak areas clearly.
+- Provide useful suggestions for improvement.
+- Do NOT repeat questions.
 - Return ONLY valid JSON.
 
 Format:
+
 {
-  "overallFeedback": "string (3-4 sentences)",
-  "strengths": ["string", "string","string"],
-  "weakAreas": ["string", "string","string"],
-  "suggestions": ["string", "string", "string"]
+  "overallFeedback": "string",
+  "strengths": ["string","string","string"],
+  "weakAreas": ["string","string","string"],
+  "suggestions": ["string","string","string"]
 }
 `;
 
-/* ================================
+/* =================================
+   SAFE JSON PARSER
+================================= */
+
+export const parseAIJSON = (text) => {
+  try {
+    const clean = text.replace(/```json|```/g, "");
+
+    return JSON.parse(clean);
+  } catch (error) {
+    console.log("JSON Parse Error:", error);
+
+    return null;
+  }
+};
+
+/* =================================
    TEST DATA
-================================ */
+================================= */
 
 const quiz = {
   topic: "DSA",
@@ -106,7 +183,7 @@ const quiz = {
   score: 2,
   percentage: 66.67,
   questions: [
-    "Which data structure stores elements in a linear sequence, where each element can be accessed by index?",
+    "Which data structure stores elements in a linear sequence?",
     "What is an algorithm primarily used for?",
     "Which data structure follows LIFO?",
   ],
@@ -126,21 +203,41 @@ const quiz = {
   },
 };
 
-/* ================================
-   TEST FEEDBACK GENERATION
-================================ */
+/* =================================
+   TEST FEEDBACK
+================================= */
 
 // const prompt = buildFeedbackPrompt(quiz);
 
 // const feedback = await runApi(prompt);
 
-// console.log("AI Feedback:");
-// console.log(feedback);
+// const parsedFeedback = parseAIJSON(feedback);
 
-/* ================================
+// console.log(parsedFeedback);
+
+/* =================================
    TEST QUESTION GENERATION
-================================ */
+================================= */
 
-// const prompt = buildPrompt("DBMS", "MEDIUM", 5);
-// const questions = await runApi(prompt);
-// console.log(questions);
+const topic = "abcdef";
+
+if (!basicTopicValidation(topic)) {
+  console.log("Invalid topic");
+} else {
+
+  const valid = await validateTopic(topic);
+
+  if (!valid) {
+    console.log("Topic not recognized");
+  } else {
+
+    const prompt = buildPrompt(topic, "MEDIUM", 5);
+
+    const questions = await runApi(prompt);
+
+    const parsed = parseAIJSON(questions);
+
+    console.log(parsed);
+
+  }
+}
