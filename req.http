@@ -1,0 +1,47 @@
+###REGISTER
+POST http://localhost:8080/user-api/register
+Content-Type: application/json
+
+{
+    "userName": "test1",
+    "email": "test1@gmail.com",
+    "password": "test1"
+}
+
+
+###LOGIN
+POST http://localhost:8080/user-api/login
+Content-Type: application/json
+#INVALID EMAIL
+# {
+#     "email": "test@gmail.com",
+#     "password":"test"
+# }
+
+#INVALID PASSWORD
+# {
+#     "email": "test1@gmail.com",
+#     "password":"test"
+# }
+
+# VALID
+{
+    "email": "test1@gmail.com",
+    "password":"test1"
+}
+
+
+###logout
+POST http://localhost:8080/user-api/logout
+Content-Type: application/json
+Cookie: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImVtYWlsIjoidGVzdDFAZ21haWwuY29tIiwicGFzc3dvcmQiOiJ0ZXN0MSJ9LCJpYXQiOjE3Njk0NDU3MTEsImV4cCI6MTc2OTUzMjExMX0.RUsGwj3Xuwee1a0DD6oV3BoGvwxmRCdy2GUzJt7pHIU
+{
+    "email": "test1@gmail.com",
+    "password":"test1"
+}
+
+
+
+###quiz
+POST http://localhost:8080//questions-api/generate
+Content-Type: application/json 
