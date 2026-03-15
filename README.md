@@ -7,7 +7,7 @@ The system uses **Groq's LLaMA-3.3-70B model** to generate multiple-choice quest
 ---
 🌐 Live Demo
 
-🔗 https://skillcheck-ai-project-groq-1.onrender.com/profile
+🔗 https://skillcheck-ai-project-groq-1.onrender.com
 
 Try the application directly in your browser without installing anything.
 
