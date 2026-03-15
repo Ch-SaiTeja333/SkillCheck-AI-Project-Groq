@@ -6,7 +6,7 @@ export const verifyToken=(req,res,next)=>{
         let userToken=req.cookies?.token;
         if(userToken == null){
             console.log("please login...")
-            return res.status(400).json({
+            return res.status(444).json({
                 message:'please login...'
             })
         }
@@ -17,10 +17,10 @@ export const verifyToken=(req,res,next)=>{
             next();
         } catch (err) {
             console.log(err)
-            return res.status(400).json({message:`session expired please login again...`});
+            return res.status(445).json({message:`session expired please login again...`});
         }
     } catch (err) {
-        return res.status(401).json({
+        return res.status(446).json({
             message:`err in verifyToken middleware [BACKEND]...${err.message}`
         });
     }
