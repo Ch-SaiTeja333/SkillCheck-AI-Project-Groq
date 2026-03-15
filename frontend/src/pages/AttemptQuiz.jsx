@@ -33,8 +33,12 @@ function AttemptQuiz() {
       // initialize user answers
       setUserAnswers(Array(res.data.payload.questions.length).fill(""));
     } catch (err) {
-      console.log(err.message, "err in Quiz generated form [FRONTEND]...");
-      toast.error("Error in generating quiz. Please try again.");
+      console.log(err, "err in Quiz generated form [FRONTEND]...");
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to generate quiz. Please try again.";
+      toast.error(errorMessage);
       navigate("/quiz");
     }
   }

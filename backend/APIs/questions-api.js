@@ -2,7 +2,7 @@
 import express from "express";
 import { Router } from "express";
 export const questionsRoutes = Router();
-import { buildPrompt, runApi, buildFeedbackPrompt } from "../Gemini_api.js";
+import { buildPrompt, runApi, buildFeedbackPrompt ,validateTopic} from "../Gemini_api.js";
 import { questionsModel } from "../models/questions-model.js";
 import mongoose from "mongoose";
 questionsRoutes.post("/generate/:id", async (req, res) => {
@@ -71,11 +71,15 @@ questionsRoutes.post("/generate/:id", async (req, res) => {
       topic,
       difficultyLevel,
       numberQuestions: numberOfQuestions,
-      questions: parsed.map((item) => item.question),
+      questions: parsed.slice(0, numberOfQuestions).map((item) => item.question),
       options: {
         userOptions: [],
-        correctOptions: parsed.map((item) => item.correctAnswer),
-        availableOptions: parsed.map((item) => item.options),
+        correctOptions: parsed
+          .slice(0, numberOfQuestions)
+          .map((item) => item.correctAnswer),
+        availableOptions: parsed
+          .slice(0, numberOfQuestions)
+          .map((item) => item.options),
       },
       score: 0,
       percentage: 0,

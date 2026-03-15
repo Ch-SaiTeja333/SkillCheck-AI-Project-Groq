@@ -12,7 +12,7 @@ export const runApi = async (promptText) => {
       {
         model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: promptText }],
-        temperature: 0.5,
+        temperature: 0.7,
       },
       {
         headers: {
@@ -87,19 +87,29 @@ Return ONLY JSON:
 /* =================================
    QUESTION GENERATION PROMPT
 ================================= */
-
 export const buildPrompt = (topic, difficultyLevel, numberOfQuestions) => `
-Generate ${numberOfQuestions} multiple-choice questions (MCQs) on the topic "${topic}".
+You are an expert exam question generator.
 
-Difficulty level: ${difficultyLevel}.
+Generate EXACTLY ${numberOfQuestions} multiple-choice questions (MCQs)
+on the topic "${topic}".
 
-Rules:
+Difficulty level: ${difficultyLevel}
+
+Difficulty rules:
+- EASY → basic definitions and beginner concepts.
+- MEDIUM → conceptual understanding and application.
+- HARD → advanced, tricky, scenario-based or analytical questions.
+
+STRICT RULES:
+- Generate EXACTLY ${numberOfQuestions} questions. Not more, not less.
 - Each question must have exactly 4 options.
-- Provide the correct answer.
+- Only one option must be correct.
+- Avoid repeated questions.
 - Do NOT include explanations.
-- Return ONLY valid JSON.
+- Output MUST be valid JSON only.
 
-Format:
+JSON format:
+
 [
   {
     "question": "string",
@@ -107,6 +117,10 @@ Format:
     "correctAnswer": "string"
   }
 ]
+
+Remember:
+Return EXACTLY ${numberOfQuestions} questions.
+Do NOT return any extra text.
 `;
 
 /* =================================
@@ -224,13 +238,11 @@ const topic = "abcdef";
 if (!basicTopicValidation(topic)) {
   console.log("Invalid topic");
 } else {
-
   const valid = await validateTopic(topic);
 
   if (!valid) {
     console.log("Topic not recognized");
   } else {
-
     const prompt = buildPrompt(topic, "MEDIUM", 5);
 
     const questions = await runApi(prompt);
@@ -238,6 +250,5 @@ if (!basicTopicValidation(topic)) {
     const parsed = parseAIJSON(questions);
 
     console.log(parsed);
-
   }
 }
