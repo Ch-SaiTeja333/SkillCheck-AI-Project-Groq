@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {createHashRouter  , RouterProvider } from "react-router-dom";
 import { lazy , Suspense } from "react";
 import Layout from "./Layout.jsx";
 const Home = lazy (() => import("../pages/Home.jsx"));
@@ -14,7 +14,7 @@ const About = lazy (() => import("../pages/About.jsx"));
 const AttemptQuiz = lazy (() => import("../pages/AttemptQuiz.jsx"));
 const EntireQuizDetails = lazy (() => import("./EntireQuizDetails.jsx"));
 function Routing() {
-  const browserRouterObj = createBrowserRouter([
+  const browserRouterObj = createHashRouter([
     {
       path: "/",
       element: (
