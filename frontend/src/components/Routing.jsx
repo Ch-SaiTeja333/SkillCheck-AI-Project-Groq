@@ -47,11 +47,11 @@ function Routing() {
         {
           path: "quiz",
           element: (
-            <ProtectedRoute>
+          
               <Suspense>
                 <Quiz></Quiz>
               </Suspense>
-            </ProtectedRoute>
+           
           ),
         },
         {
