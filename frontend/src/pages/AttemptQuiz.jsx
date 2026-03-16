@@ -2,75 +2,63 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import Feedback from "../components/Feedback";
-
+import { Link } from "react-router-dom";
 function AttemptQuiz() {
   const location = useLocation();
   const navigate = useNavigate();
   const data = location.state;
-
-  const user = useAuthStore((s) => s.user);
-  const isLoading = useAuthStore((s) => s.isLoading);
-
+  const { user } = useAuthStore();
+  // console.log("data in attempt",data)
+  // console.log(user,".......................................")
   const [resdata, setResdata] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
   const [docId, setDocId] = useState(null);
   const [isSubmit, setIsSubmit] = useState(true);
   const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
-  const [isResults, setISResults] = useState(false);
-
-  // check state
-  useEffect(() => {
-    if (!location.state) {
-      navigate("/quiz");
-      return;
-    }
-
-    navigate(location.pathname, { replace: true, state: null });
-  }, []);
-
+  const [isresluts, setISResults] = useState(false);
+  // console.log("current  user :........", user);
   async function getQuestions() {
     try {
       let res = await axios.post(
         `http://localhost:8080/questions-api/generate/${user.id}`,
         data,
-        { withCredentials: true }
+        { withCredentials: true },
       );
-
+      // console.log("res  ...", res.data.payload);
       setDocId(res.data.payload._id);
       setResdata(res.data.payload);
+      // initialize user answers
       setUserAnswers(Array(res.data.payload.questions.length).fill(""));
     } catch (err) {
-      console.log(err);
+      console.log(err, "err in Quiz generated form [FRONTEND]...");
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
-        "Failed to generate quiz.";
+        "Failed to generate quiz. Please try again.";
       toast.error(errorMessage);
       navigate("/quiz");
     }
   }
-
   useEffect(() => {
-    if (data) {
-      getQuestions();
-    }
+    getQuestions();
   }, []);
-
   function handleChange(index, value) {
     let updated = [...userAnswers];
     updated[index] = value;
     setUserAnswers(updated);
   }
-
   function displayError() {
     const unanswered = [];
     userAnswers.forEach((ans, index) => {
-      if (!ans) unanswered.push(index + 1);
+      if (!ans) {
+        unanswered.push(index + 1);
+      }
     });
-
     if (unanswered.length > 0) {
+      // alert(`Please answer Question ${unanswered.join(", ")}`);
       toast.error(`Please answer Question ${unanswered.join(", ")}`);
       setIsSubmit(true);
       setISResults(false);
@@ -78,37 +66,38 @@ function AttemptQuiz() {
     }
     return false;
   }
-
   async function submitQuiz() {
     setIsSubmit(false);
     setISResults(true);
-
     if (displayError()) return;
-
     let score = 0;
     userAnswers.forEach((ans, index) => {
-      if (ans === resdata.options.correctOptions[index]) score++;
+      if (ans === resdata.options.correctOptions[index]) {
+        score++;
+      }
     });
-
+    // alert(`Your Score: ${score}/${resdata.questions.length}`);
     toast.success(`Your Score: ${score}/${resdata.questions.length}`);
 
+    //! score and correct answers update in database
     try {
-      await axios.put(
+      // console.log(resdata);
+      let res = await axios.put(
         `http://localhost:8080/questions-api/score-answers`,
         { score: score, userOptions: userAnswers, docId: docId },
-        { withCredentials: true }
+        { withCredentials: true },
       );
-
       setIsFeedbackVisible(true);
+      // console.log("Score updated successfully", res.data);
     } catch (error) {
-      console.log("Score update error", error.message);
+      console.log("error in Score updation .... [frontend]", error.message);
     }
   }
 
   if (!resdata) {
     return (
-      <div className="d-flex align-items-center justify-content-center mt-5">
-        <div className="spinner-border"></div>
+      <div className="d-flex align-items-center justify-content-center mt-5 ">
+        <div class="spinner-3"></div>
       </div>
     );
   }
@@ -124,15 +113,15 @@ function AttemptQuiz() {
       >
         <div className="row text-center">
           <div className="col-md-4 col-12 mb-2">
-            <strong>Topic:</strong> {data?.topic}
+            <strong>Topic:</strong> {data.topic}
           </div>
 
           <div className="col-md-4 col-12 mb-2">
-            <strong>Difficulty:</strong> {data?.difficultyLevel}
+            <strong>Difficulty:</strong> {data.difficultyLevel}
           </div>
 
           <div className="col-md-4 col-12">
-            <strong>No of Questions:</strong> {data?.numberOfQuestions}
+            <strong>No of Questions:</strong> {data.numberOfQuestions}
           </div>
         </div>
       </div>
@@ -175,8 +164,8 @@ function AttemptQuiz() {
           </button>
         </div>
       )}
-
-      {/* Feedback */}
+      
+      {/* Feedback Section */}
       {isFeedbackVisible && <Feedback docId={docId} />}
     </div>
   );
