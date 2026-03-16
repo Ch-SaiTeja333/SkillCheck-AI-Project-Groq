@@ -46,9 +46,7 @@ app.use(cookieParser());
 ================================ */
 
 app.use("/user-api", userRoutes);
-
 app.use("/questions-api", verifyToken, questionsRoutes);
-
 app.use("/history-api", verifyToken, historyRoutes);
 
 /* ================================
