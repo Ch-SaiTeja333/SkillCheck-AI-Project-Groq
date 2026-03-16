@@ -1,43 +1,83 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
+
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import morgan from "morgan";
+
 import { userRoutes } from "./APIs/user-api.js";
 import { historyRoutes } from "./APIs/history-api.js";
 import { questionsRoutes } from "./APIs/questions-api.js";
-import cors from "cors";
-
-import morgan from "morgan";
 import { verifyToken } from "./middlewares/verifyToken.js";
+
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
+
+/* ================================
+   __dirname support for ES modules
+================================ */
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* ================================
+   Middlewares
+================================ */
 
 app.use(morgan("dev"));
+
 app.use(express.json());
+
 app.use(
   cors({
     origin: "https://skillcheck-ai-project-groq-1.onrender.com",
     credentials: true,
   }),
 );
+
 app.use(cookieParser());
 
+/* ================================
+   API Routes
+================================ */
+
 app.use("/user-api", userRoutes);
+
 app.use("/questions-api", verifyToken, questionsRoutes);
+
 app.use("/history-api", verifyToken, historyRoutes);
 
-//! connect to database
+/* ================================
+   Serve React Frontend
+================================ */
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+/* ================================
+   React Router Fix (IMPORTANT)
+================================ */
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
+/* ================================
+   Database Connection
+================================ */
+
 mongoose
-  .connect(
-    "mongodb+srv://chintakrindasaiteja_db_user:n8y1AuHluMBLOBiA@cluster0.1n1pqtg.mongodb.net/skill-check-ai-groq-project",
-  )
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Database connected successfully");
+
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.log("Database connection failed..", err.message);
+    console.log("Database connection failed:", err.message);
   });
