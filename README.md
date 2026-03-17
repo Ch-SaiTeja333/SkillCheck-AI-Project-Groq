@@ -5,6 +5,7 @@ SkillCheck AI is an **AI-powered quiz generation platform** that allows users to
 The system uses **Groq's LLaMA-3.3-70B model** to generate multiple-choice questions and provide intelligent feedback based on user performance.
 
 ---
+
 🌐 Live Demo
 
 🔗 https://skillcheck-ai-project-groq-1.onrender.com
@@ -12,22 +13,23 @@ The system uses **Groq's LLaMA-3.3-70B model** to generate multiple-choice quest
 Try the application directly in your browser without installing anything.
 
 ---
+
 # 🚀 Features
 
-* 🤖 **AI-Generated Quiz Questions**
-* 📚 Supports **any academic or professional topic**
-* 🎯 **Difficulty Levels**
+- 🤖 **AI-Generated Quiz Questions**
+- 📚 Supports **any academic or professional topic**
+- 🎯 **Difficulty Levels**
+  - Easy
+  - Medium
+  - Hard
 
-  * Easy
-  * Medium
-  * Hard
-* 🧠 **AI-Generated Performance Feedback**
-* 📊 **Automatic Score Calculation**
-* 🔍 **Topic Validation (AI + Backend)**
-* 💾 **MongoDB Database Storage**
-* ⚡ **Fast AI responses using Groq API**
-* 🔐 **User Authentication**
-* 🧾 **Quiz Attempt History**
+- 🧠 **AI-Generated Performance Feedback**
+- 📊 **Automatic Score Calculation**
+- 🔍 **Topic Validation (AI + Backend)**
+- 💾 **MongoDB Database Storage**
+- ⚡ **Fast AI responses using Groq API**
+- 🔐 **User Authentication**
+- 🧾 **Quiz Attempt History**
 
 ---
 
@@ -35,24 +37,24 @@ Try the application directly in your browser without installing anything.
 
 ## Frontend
 
-* React
-* React Router
-* Axios
-* Bootstrap
-* React Toastify
-* Zustand (for state management)
+- React
+- React Router
+- Axios
+- Bootstrap
+- React Toastify
+- Zustand (for state management)
 
 ## Backend
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
 
 ## AI Model
 
-* **Groq API**
-* Model used:
+- **Groq API**
+- Model used:
 
 ```
 llama-3.3-70b-versatile
@@ -173,7 +175,7 @@ npm run dev
 Backend runs on:
 
 ```
-http://localhost:8080
+https://skillcheck-ai-project-groq.onrender.com
 ```
 
 Frontend runs on:
@@ -231,14 +233,14 @@ Example Response:
 
 1️⃣ User selects:
 
-* Topic
-* Difficulty Level
-* Number of Questions
+- Topic
+- Difficulty Level
+- Number of Questions
 
 2️⃣ Backend:
 
-* Validates topic
-* Sends prompt to Groq API
+- Validates topic
+- Sends prompt to Groq API
 
 3️⃣ AI generates quiz questions.
 
@@ -248,8 +250,8 @@ Example Response:
 
 6️⃣ Backend:
 
-* Calculates score
-* Stores answers
+- Calculates score
+- Stores answers
 
 7️⃣ AI generates **performance feedback**.
 
@@ -279,12 +281,12 @@ Example Response:
 
 # 🌟 Future Improvements
 
-* Topic auto-suggestions
-* AI explanation for answers
-* Leaderboard system
-* Timed quizzes
-* AI adaptive difficulty
-* Deployment with Docker
+- Topic auto-suggestions
+- AI explanation for answers
+- Leaderboard system
+- Timed quizzes
+- AI adaptive difficulty
+- Deployment with Docker
 
 ---
 
