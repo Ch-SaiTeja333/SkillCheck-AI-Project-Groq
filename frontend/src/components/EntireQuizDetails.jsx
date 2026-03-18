@@ -1,64 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 function EntireQuizDetails() {
   const location = useLocation();
   const { historyId, userId } = location.state;
-
   const [quizDetails, setQuizDetails] = useState(null);
-  const [feedback, setFeedback] = useState(null);
-  const [loadingFeedback, setLoadingFeedback] = useState(false);
-
-  // Fetch quiz details
+  const [availableFeedback, setAvailableFeedback] = useState(null);
+  // console.log("history id in entire quiz details page : ", historyId);
+  // console.log("user id in entire quiz details page : ", userId);
   async function getEntireQuizDetails() {
     try {
       let res = await axios.get(
-        `http://localhost:8080/history-api/user-history/${userId}/${historyId}`,
+        `https://skillcheck-ai-project-groq.onrender.com/history-api/user-history/${userId}/${historyId}`,
         { withCredentials: true },
       );
+      // console.log("entire quiz details : ",res.data.payload);
       setQuizDetails(res.data.payload);
     } catch (err) {
       console.log(
-        "error in EntireQuizDetails component [frontend]",
+        "error in EntireQuizDetails...component [frontend]",
         err.message,
       );
     }
   }
 
-  // Fetch feedback on button click
-  async function getFeedback() {
+  async function generateFeedback() {
     try {
-      if (!quizDetails?._id) return;
-
-      setLoadingFeedback(true);
-
+      let docId = quizDetails._id;
       let res = await axios.put(
-        `http://localhost:8080/questions-api/feedback`,
-        { id: quizDetails._id },
+        "https://skillcheck-ai-project-groq.onrender.com/questions-api/feedback",
+        { id: docId },
         { withCredentials: true },
       );
-
-      console.log("feedback details : ", res.data.payload);
-      setFeedback(res.data.payload);
+      // console.log("........",res);
+      // console.log('feedback..',res.data.payload);
+      setAvailableFeedback(res.data.payload);
     } catch (err) {
       console.log(
-        "error in fetching feedback in EntireQuizDetails component",
+        "error in generating feedback in EntireQuizDetails...component [frontend]",
         err.message,
       );
-    } finally {
-      setLoadingFeedback(false);
     }
   }
 
   useEffect(() => {
-    if (quizDetails?.feedback) {
-      try {
-        const parsed = JSON.parse(quizDetails.feedback);
-        setFeedback(parsed);
-      } catch (err) {
-        console.log("Error parsing feedback:", err.message);
-      }
+    getEntireQuizDetails();
+  }, []);
+
+  useEffect(() => {
+    if (
+      quizDetails &&
+      quizDetails.feedback &&
+      quizDetails.feedback.length > 0
+    ) {
+      const x = JSON.parse(quizDetails.feedback);
+      setAvailableFeedback(x);
     }
   }, [quizDetails]);
 
@@ -132,74 +130,64 @@ function EntireQuizDetails() {
         </div>
       ))}
 
-      {/* Feedback Section */}
+      {/* Feedback */}
       <h4 className="mt-5 mb-3 text-center fw-bold">Feedback</h4>
 
-      {feedback ? (
+      {availableFeedback ? (
         <div
           className="card shadow-sm p-md-4 p-3 rounded-4 mb-5"
           style={{ backgroundColor: "#F0F6FF" }}
         >
           <p>
-            <strong>Overall:</strong> {feedback.overallFeedback}
+            <strong>Overall:</strong> {availableFeedback.overallFeedback}
           </p>
 
-          {/* Optional detailed feedback */}
-          {feedback.strengths && (
-            <>
-              <p className="mt-3">
-                <strong>Strengths:</strong>
-              </p>
-              <ul>
-                {feedback.strengths.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </>
-          )}
+          <p className="mt-3">
+            <strong>Strengths:</strong>
+          </p>
+          <ul>
+            {availableFeedback.strengths.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ul>
 
-          {feedback.weakAreas && (
-            <>
-              <p className="mt-3">
-                <strong>Weak Areas:</strong>
-              </p>
-              <ul>
-                {feedback.weakAreas.map((w, i) => (
-                  <li key={i}>{w}</li>
-                ))}
-              </ul>
-            </>
-          )}
+          <p className="mt-3">
+            <strong>Weak Areas:</strong>
+          </p>
+          <ul>
+            {availableFeedback.weakAreas.map((w, i) => (
+              <li key={i}>{w}</li>
+            ))}
+          </ul>
 
-          {feedback.suggestions && (
-            <>
-              <p className="mt-3">
-                <strong>Suggestions:</strong>
-              </p>
-              <ul>
-                {feedback.suggestions.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </>
-          )}
+          <p className="mt-3">
+            <strong>Suggestions:</strong>
+          </p>
+          <ul>
+            {availableFeedback.suggestions.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ul>
         </div>
       ) : (
-        <div>
-          <p className="text-center">No feedback available.</p>
+        <div className="text-center">
           <button
-            className="btn btn-primary d-block mx-auto"
-            onClick={getFeedback}
-            disabled={loadingFeedback}
+            className="btn btn-primary mb-2"
+            style={{ width: "150px" }}
+            onClick={generateFeedback}
           >
-            {loadingFeedback ? "Fetching..." : "Get Feedback"}
+            Get Feedback
           </button>
         </div>
       )}
 
       {/* Back to Top */}
       <div className="text-center">
-        <button className="btn btn-success mt-4 mb-5" onClick={backToTop}>
+        <button
+          className="btn btn-success mb-2"
+          style={{ width: "150px" }}
+          onClick={backToTop}
+        >
           Back to Top
         </button>
       </div>
