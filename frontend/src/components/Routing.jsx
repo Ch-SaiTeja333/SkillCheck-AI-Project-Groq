@@ -2,6 +2,8 @@ import React from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Layout from "./Layout.jsx";
+import Profile from "../pages/Profile.jsx";
+import History from "../pages/History.jsx";
 const Home = lazy(() => import("../pages/Home.jsx"));
 const Login = lazy(() => import("../pages/Login.jsx"));
 const Register = lazy(() => import("../pages/Register.jsx"));
@@ -58,9 +60,9 @@ function Routing() {
           path: "history",
           element: (
             <ProtectedRoute>
-              <Suspense>
+             
                 <History></History>
-              </Suspense>
+             
             </ProtectedRoute>
           ),
         },
@@ -78,9 +80,7 @@ function Routing() {
           path: "profile",
           element: (
             <ProtectedRoute>
-              <Suspense>
                 <Profile></Profile>
-              </Suspense>
             </ProtectedRoute>
           ),
         },
